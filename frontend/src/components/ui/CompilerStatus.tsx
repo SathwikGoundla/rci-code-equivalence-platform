@@ -1,18 +1,11 @@
 import React from 'react';
 import type { CompilerInfo } from '../../types';
-import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 
 interface CompilerStatusProps {
   language: 'C' | 'Fortran';
   compilers: CompilerInfo[];
   loading?: boolean;
 }
-
-const StatusIcon: React.FC<{ status: CompilerInfo['status'] }> = ({ status }) => {
-  if (status === 'detected')  return <CheckCircle2 size={14} color="var(--status-detected)" />;
-  if (status === 'not_found') return <AlertCircle  size={14} color="var(--status-not-found)" />;
-  return <XCircle size={14} color="var(--status-error)" />;
-};
 
 export const CompilerStatusCard: React.FC<CompilerStatusProps> = ({
   language,

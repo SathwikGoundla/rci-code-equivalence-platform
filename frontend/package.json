@@ -10,15 +10,17 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.23.1",
+    "@monaco-editor/react": "^4.7.0",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
-    "react-chartjs-2": "^5.2.0",
+    "clsx": "^2.1.1",
     "lucide-react": "^0.395.0",
-    "zustand": "^4.5.2",
-    "clsx": "^2.1.1"
+    "monaco-editor": "^0.56.0",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

@@ -85,5 +85,23 @@ class Settings(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    """Return cached application settings. Thread-safe via lru_cache."""
-    return Settings()
+    """Return cached application settings with overrides loaded from config.json."""
+    settings = Settings()
+    
+    # Load config overrides from config.json if it exists
+    import json
+    if os.path.exists("config.json"):
+        try:
+            with open("config.json", "r", encoding="utf-8") as f:
+                overrides = json.load(f)
+                if "execution_timeout" in overrides:
+                    settings.execution_timeout = overrides["execution_timeout"]
+                if "c_compiler_path" in overrides:
+                    settings.c_compiler_path = overrides["c_compiler_path"]
+                if "fortran_compiler_path" in overrides:
+                    settings.fortran_compiler_path = overrides["fortran_compiler_path"]
+        except Exception as e:
+            # Avoid logging issues during early bootstrap, just print/suppress
+            pass
+            
+    return settings

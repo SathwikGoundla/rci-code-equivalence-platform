@@ -1,17 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '../components/layout/Header';
-import { Settings as SettingsIcon, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
+import { api } from '../services/api';
 
 export const Settings: React.FC = () => {
   const [atol, setAtol] = useState('1e-6');
   const [rtol, setRtol] = useState('1e-9');
   const [timeout, setTimeout_] = useState('30');
+  const [cCompilerPath, setCCompilerPath] = useState('');
+  const [fortranCompilerPath, setFortranCompilerPath] = useState('');
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const handleSave = () => {
-    // Phase 2+: persist to backend config
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 2000);
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await api.get('/settings/');
+        setAtol(String(res.data.atol));
+        setRtol(String(res.data.rtol));
+        setTimeout_(String(res.data.execution_timeout));
+        setCCompilerPath(res.data.c_compiler_path || '');
+        setFortranCompilerPath(res.data.fortran_compiler_path || '');
+      } catch (err) {
+        console.error('Failed to load settings:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      await api.post('/settings/', {
+        atol: parseFloat(atol),
+        rtol: parseFloat(rtol),
+        execution_timeout: parseInt(timeout),
+        c_compiler_path: cCompilerPath,
+        fortran_compiler_path: fortranCompilerPath,
+      });
+      setSaved(true);
+      window.setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      console.error('Failed to save settings:', err);
+      alert('Error saving settings to backend.');
+    }
   };
 
   const fieldStyle: React.CSSProperties = {
@@ -32,6 +65,15 @@ export const Settings: React.FC = () => {
     marginBottom: 6,
     display: 'block',
   };
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <Header title="Settings" subtitle="Configure tolerances, compiler paths, and execution parameters" />
+        <div className="page-content">Loading configuration...</div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -63,11 +105,11 @@ export const Settings: React.FC = () => {
             </div>
             <div>
               <label style={labelStyle}>C Compiler Path (leave blank to auto-detect)</label>
-              <input style={fieldStyle} placeholder="e.g. C:/msys64/mingw64/bin/gcc.exe" id="input-c-compiler-path" />
+              <input style={fieldStyle} value={cCompilerPath} onChange={e => setCCompilerPath(e.target.value)} placeholder="e.g. C:/msys64/mingw64/bin/gcc.exe" id="input-c-compiler-path" />
             </div>
             <div style={{ marginTop: 16 }}>
               <label style={labelStyle}>Fortran Compiler Path (leave blank to auto-detect)</label>
-              <input style={fieldStyle} placeholder="e.g. C:/msys64/mingw64/bin/gfortran.exe" id="input-fortran-compiler-path" />
+              <input style={fieldStyle} value={fortranCompilerPath} onChange={e => setFortranCompilerPath(e.target.value)} placeholder="e.g. C:/msys64/mingw64/bin/gfortran.exe" id="input-fortran-compiler-path" />
             </div>
           </div>
         </div>
@@ -75,9 +117,6 @@ export const Settings: React.FC = () => {
         <button className="btn btn-primary" onClick={handleSave} id="btn-save-settings">
           <Save size={14} /> {saved ? 'Saved!' : 'Save Settings'}
         </button>
-        <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-muted)' }}>
-          Note: Settings persistence to backend config is implemented in Phase 2.
-        </div>
       </div>
     </div>
   );

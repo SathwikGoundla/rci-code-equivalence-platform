@@ -38,6 +38,7 @@ _gap_engine = GapDetectionEngine()
 async def upload_and_analyze(
     c_file: UploadFile = File(..., description="C source file (.c)"),
     fortran_file: UploadFile = File(..., description="Fortran source file (.f90 or .f)"),
+    project_id: Optional[str] = Form(None, description="Optional project ID to associate with the analysis"),
     db: AsyncSession = Depends(get_db),
 ) -> AnalysisResultSchema:
     """
@@ -66,6 +67,7 @@ async def upload_and_analyze(
     # Create analysis session record
     session = AnalysisSession(
         id=session_id,
+        project_id=project_id,
         status="running",
         c_filename=c_file.filename,
         fortran_filename=fortran_file.filename,
@@ -185,11 +187,17 @@ async def upload_and_analyze(
 
 
 @router.get("/analysis/", summary="List analysis sessions")
-async def list_analyses(db: AsyncSession = Depends(get_db)):
+async def list_analyses(
+    project_id: Optional[str] = None,
+    db: AsyncSession = Depends(get_db)
+):
     """Return a list of all analysis sessions (metadata only, no source code)."""
     from sqlalchemy import select
+    query = select(AnalysisSession)
+    if project_id:
+        query = query.where(AnalysisSession.project_id == project_id)
     result = await db.execute(
-        select(AnalysisSession).order_by(AnalysisSession.created_at.desc()).limit(50)
+        query.order_by(AnalysisSession.created_at.desc()).limit(50)
     )
     sessions = result.scalars().all()
     return [
@@ -239,3 +247,17 @@ async def get_analysis(session_id: str, db: AsyncSession = Depends(get_db)):
         "completed_at": session.completed_at.isoformat() if session.completed_at else None,
         "error": session.error_message,
     }
+
+
+@router.delete("/analysis/{session_id}", status_code=204, summary="Delete an analysis session")
+async def delete_analysis(session_id: str, db: AsyncSession = Depends(get_db)):
+    """Delete an analysis session."""
+    from sqlalchemy import select
+    result = await db.execute(
+        select(AnalysisSession).where(AnalysisSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+    if not session:
+        raise HTTPException(status_code=404, detail=f"Analysis session '{session_id}' not found.")
+    await db.delete(session)
+

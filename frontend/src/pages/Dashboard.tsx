@@ -7,12 +7,8 @@ import type { SystemStatusResponse, SystemInfoResponse, AnalysisSummary } from '
 import {
   Code2,
   GitCompareArrows,
-  FlaskConical,
   AlertTriangle,
   CheckCircle2,
-  Clock,
-  Cpu,
-  Database,
   RefreshCw,
 } from 'lucide-react';
 

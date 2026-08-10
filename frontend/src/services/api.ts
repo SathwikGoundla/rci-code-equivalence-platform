@@ -38,11 +38,15 @@ export async function getSystemInfo(): Promise<SystemInfoResponse> {
 
 export async function uploadAndAnalyze(
   cFile: File,
-  fortranFile: File
+  fortranFile: File,
+  projectId: string | null = null
 ): Promise<AnalysisResult> {
   const formData = new FormData();
   formData.append('c_file', cFile);
   formData.append('fortran_file', fortranFile);
+  if (projectId) {
+    formData.append('project_id', projectId);
+  }
 
   const { data } = await api.post<AnalysisResult>('/analysis/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
@@ -50,8 +54,10 @@ export async function uploadAndAnalyze(
   return data;
 }
 
-export async function listAnalyses(): Promise<AnalysisSummary[]> {
-  const { data } = await api.get<AnalysisSummary[]>('/analysis/');
+export async function listAnalyses(projectId: string | null = null): Promise<AnalysisSummary[]> {
+  const { data } = await api.get<AnalysisSummary[]>('/analysis/', {
+    params: projectId ? { project_id: projectId } : {},
+  });
   return data;
 }
 
@@ -71,3 +77,6 @@ export async function createProject(name: string, description: string = '') {
   const { data } = await api.post('/projects/', { name, description });
   return data;
 }
+
+export { api };
+

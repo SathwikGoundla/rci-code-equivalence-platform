@@ -8,6 +8,7 @@ import { Visualization } from './pages/Visualization';
 import { Reports } from './pages/Reports';
 import { Settings } from './pages/Settings';
 import { SystemDiagnostics } from './pages/SystemDiagnostics';
+import { History } from './pages/History';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Routes>
             <Route path="/"              element={<Dashboard />} />
             <Route path="/analysis"      element={<Analysis />} />
+            <Route path="/history"       element={<History />} />
             <Route path="/gaps"          element={<GapDetection />} />
             <Route path="/tests"         element={<TestExecution />} />
             <Route path="/visualization" element={<Visualization />} />

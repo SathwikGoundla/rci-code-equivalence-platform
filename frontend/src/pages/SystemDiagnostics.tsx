@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Header } from '../components/layout/Header';
 import { getSystemInfo } from '../services/api';
 import type { SystemInfoResponse, CompilerInfo } from '../types';
-import { RefreshCw, CheckCircle2, XCircle, AlertCircle, Monitor, Cpu, HardDrive, Database, Wifi, Bot, Terminal } from 'lucide-react';
+import { RefreshCw, CheckCircle2, XCircle, AlertCircle, Monitor, Cpu, HardDrive, Wifi, Terminal } from 'lucide-react';
 
 const CompilerRow: React.FC<{ compiler: CompilerInfo }> = ({ compiler }) => {
   const icon =

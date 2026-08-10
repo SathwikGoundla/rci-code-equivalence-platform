@@ -21,7 +21,7 @@ from fastapi.responses import JSONResponse
 from app.config import get_settings
 from app.database import init_db
 from app.utils.logging import configure_logging
-from app.api import health, analysis, projects
+from app.api import health, analysis, projects, settings as api_settings
 
 # ── Logging ────────────────────────────────────────────────────────────────────
 configure_logging()
@@ -97,6 +97,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router, prefix="/api/v1", tags=["Health"])
     app.include_router(analysis.router, prefix="/api/v1", tags=["Analysis"])
     app.include_router(projects.router, prefix="/api/v1", tags=["Projects"])
+    app.include_router(api_settings.router, prefix="/api/v1", tags=["Settings"])
 
     return app
 
