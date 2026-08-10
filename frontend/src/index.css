@@ -604,3 +604,452 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PHASE 2 — Monaco Editor + File Upload UI Polish
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Drop Zone ─────────────────────────────────────────────────────────────── */
+.drop-zone {
+  background: var(--bg-card);
+  border: 1.5px dashed var(--border-normal);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+  outline: none;
+  user-select: none;
+}
+
+.drop-zone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--dz-accent-bg, rgba(61, 122, 245, 0.06));
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  pointer-events: none;
+}
+
+.drop-zone:hover {
+  border-color: var(--dz-accent, var(--accent-blue));
+  border-style: solid;
+}
+.drop-zone:hover::before { opacity: 1; }
+
+.drop-zone:focus-visible {
+  box-shadow: 0 0 0 2px var(--dz-accent, var(--accent-blue));
+}
+
+.drop-zone.drag-over {
+  border-color: var(--dz-accent, var(--accent-blue));
+  border-style: solid;
+  box-shadow: 0 0 0 3px rgba(61, 122, 245, 0.15), inset 0 0 40px rgba(61, 122, 245, 0.05);
+  transform: scale(1.005);
+}
+.drop-zone.drag-over::before { opacity: 1; }
+
+.drop-zone.has-file {
+  border-style: solid;
+  border-color: var(--dz-accent, var(--accent-blue));
+  cursor: default;
+  padding: 14px 20px;
+}
+.drop-zone.has-file::before { opacity: 1; }
+
+/* Empty state inner layout */
+.drop-zone-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  text-align: center;
+}
+
+.drop-zone-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.drop-zone-icon-wrap--active {
+  transform: scale(1.1);
+  box-shadow: 0 0 16px var(--dz-accent, rgba(61, 122, 245, 0.4));
+}
+
+.drop-zone-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.drop-zone-sublabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.drop-zone-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Has-file state inner layout */
+.drop-zone-file-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.drop-zone-file-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.drop-zone-file-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.drop-zone-file-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drop-zone-file-size {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.drop-zone-remove {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: var(--accent-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+.drop-zone-remove:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: scale(1.05);
+}
+
+/* ── Editor Wrapper ─────────────────────────────────────────────────────────── */
+.editor-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: box-shadow var(--transition-base);
+}
+
+.editor-wrapper:focus-within {
+  border-color: var(--ew-accent, var(--border-active));
+  box-shadow: 0 0 0 1px var(--ew-accent, var(--border-active));
+}
+
+.editor-wrapper.expanded {
+  position: fixed;
+  inset: 60px 16px 16px;
+  z-index: 200;
+  height: auto;
+  box-shadow: var(--shadow-lg), 0 0 60px rgba(0,0,0,0.6);
+}
+
+/* ── Editor Toolbar ─────────────────────────────────────────────────────────── */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  height: 34px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.editor-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.editor-lang-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+
+.editor-toolbar-filename {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.editor-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.editor-toolbar-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.editor-toolbar-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.editor-font-size {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  width: 28px;
+  text-align: center;
+}
+
+.editor-toolbar-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-subtle);
+  margin: 0 2px;
+}
+
+/* ── Editor Status Bar ──────────────────────────────────────────────────────── */
+.editor-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  height: 22px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-subtle);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.editor-status-left,
+.editor-status-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editor-status-sep {
+  color: var(--border-normal);
+}
+
+.editor-status-pos {
+  font-weight: 600;
+}
+
+.editor-status-readonly {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.7;
+}
+
+/* ── Editor Resize Handle ───────────────────────────────────────────────────── */
+.editor-resize-handle {
+  width: 8px;
+  flex-shrink: 0;
+  background: transparent;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background var(--transition-fast);
+}
+
+.editor-resize-handle::before {
+  content: '';
+  width: 2px;
+  height: 40px;
+  border-radius: 2px;
+  background: var(--border-subtle);
+  transition: all var(--transition-fast);
+}
+
+.editor-resize-handle:hover::before,
+.editor-resize-handle.dragging::before {
+  background: var(--accent-blue);
+  height: 60px;
+  box-shadow: 0 0 8px rgba(61, 122, 245, 0.5);
+}
+
+/* ── Analysis Progress Bar ──────────────────────────────────────────────────── */
+.analysis-progress {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.analysis-progress-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+}
+
+.analysis-progress-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.progress-step {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 0;
+  position: relative;
+}
+
+.progress-step-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-normal);
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-base);
+  color: var(--text-muted);
+  font-size: 10px;
+  z-index: 1;
+}
+
+.progress-step.done .progress-step-dot {
+  border-color: var(--accent-green);
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent-green);
+}
+
+.progress-step.active .progress-step-dot {
+  border-color: var(--accent-blue);
+  background: rgba(61, 122, 245, 0.15);
+  box-shadow: 0 0 0 3px rgba(61, 122, 245, 0.15);
+  animation: pulse-dot 1s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(61, 122, 245, 0.15); }
+  50%       { box-shadow: 0 0 0 6px rgba(61, 122, 245, 0.05); }
+}
+
+.progress-step-label {
+  position: absolute;
+  top: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.progress-step.done   .progress-step-label { color: var(--accent-green); }
+.progress-step.active .progress-step-label { color: var(--accent-blue); font-weight: 600; }
+
+.progress-step-line {
+  flex: 1;
+  height: 1.5px;
+  background: var(--border-subtle);
+  margin: 0 2px;
+  transition: background var(--transition-base);
+}
+
+.progress-step.done .progress-step-line {
+  background: var(--accent-green);
+}
+
+/* ── Shimmer (loading) ─────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  from { background-position: -400px 0; }
+  to   { background-position:  400px 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--bg-tertiary)  50%,
+    var(--bg-secondary) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}

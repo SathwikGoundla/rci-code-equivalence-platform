@@ -11,7 +11,7 @@ no external APIs, no cloud storage, no telemetry.
 
 ---
 
-## Features (Phase 1)
+## Features (Phase 1 + 2 + 3)
 
 - ✅ **Source ingestion** — Upload C (`.c`) and Fortran (`.f90`) files
 - ✅ **Structural analysis** — Functions, parameters, types, LOC, cyclomatic complexity
@@ -23,14 +23,23 @@ no external APIs, no cloud storage, no telemetry.
 - ✅ **Professional dashboard** — Engineering-grade dark-theme UI
 - ✅ **Security sandbox** — Pattern scanning, size validation, source-code log redaction
 - ✅ **Offline-first** — All 7 analysis steps work without internet
+- ✅ **Drag-and-drop upload** — Animated drop zones with glow states and file-remove button
+- ✅ **Monaco editor toolbar** — Language badge, filename, copy-to-clipboard, font-size ±, expand
+- ✅ **Resizable editor panes** — Drag divider between C and Fortran editors
+- ✅ **Editor status bar** — Live line:col, total lines, encoding, language, read-only indicator
+- ✅ **Fortran syntax highlighting** — Custom Monaco grammar for Fortran 90 keywords
+- ✅ **Analysis progress bar** — Animated 6-step pipeline indicator during analysis
+- ✅ **tree-sitter C parser** — Full AST: typed params, locals, array dims, pointer types, #define/include
+- ✅ **fparser2 Fortran parser** — Full AST: INTENT, IMPLICIT NONE, typed params, local vars, USE/MODULE
+- ✅ **Graceful parser fallback** — Regex fallback activates automatically if AST parser fails
 
 ## Roadmap
 
 | Phase | Status | Feature |
 |-------|--------|---------|
 | 1  | ✅ Done | Repository, architecture, backend skeleton, frontend dashboard |
-| 2  | Planned | Monaco code editor, file upload UI polish |
-| 3  | Planned | tree-sitter (C) + fparser2 (Fortran) full AST parsers |
+| 2  | ✅ Done | Monaco code editor toolbar, drag-and-drop upload UI, Fortran syntax highlighting |
+| 3  | ✅ Done | tree-sitter (C) + fparser2 (Fortran) full AST parsers, typed params, local vars, INTENT |
 | 4  | Planned | Deep IR generation from ASTs |
 | 5  | Planned | Semantic comparison, control-flow graph diff |
 | 6  | Planned | Gap management console, diff viewer |
@@ -152,12 +161,14 @@ and enforcement mechanisms.
 
 ---
 
-## Limitations (Phase 1)
+## Limitations (Phase 1–3)
 
-- **C parser**: Regex-based structural extraction. Does not handle all C99/C11 constructs.
-  Will be upgraded to `tree-sitter` in Phase 3.
-- **Fortran parser**: Regex-based. Does not handle Fortran 77 fixed-form or COMMON blocks.
-  Will be upgraded to `fparser2` in Phase 3.
+- **C parser (Phase 3)**: tree-sitter handles C99/C11 constructs. Preprocessor macros
+  with function-like syntax (e.g., `#define MAX(a,b) ...`) are extracted as constants,
+  not as callable functions.
+- **Fortran parser (Phase 3)**: fparser2 handles Fortran 90/95/2003 free-form.
+  Fortran 77 fixed-form and non-standard extensions may trigger regex fallback.
+  COMMON blocks are detected but not fully typed yet (Phase 4).
 - **Execution**: Compilation and execution are not available until Phase 8.
 - **Visualization**: Charts are not available until Phase 11.
 - **Reports**: Export is not available until Phase 12.
