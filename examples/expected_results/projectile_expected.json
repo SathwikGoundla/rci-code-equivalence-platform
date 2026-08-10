@@ -1,0 +1,40 @@
+{
+  "test_suite": "projectile_motion",
+  "description": "Expected numerical outputs for projectile motion calculator",
+  "tolerance": {
+    "atol": 1e-4,
+    "rtol": 1e-6
+  },
+  "cases": [
+    {
+      "id": "projectile_01",
+      "c_expected": {
+        "stdout_lines": ["1019.367993", "254.841998", "14.429048"],
+        "exit_code": 0
+      },
+      "fortran_expected": {
+        "stdout_lines": ["1019.367993", "254.841998", "14.429048"],
+        "exit_code": 0
+      },
+      "equivalence": "PASS"
+    },
+    {
+      "id": "projectile_02",
+      "c_expected": {
+        "stdout_lines": ["220.773975", "31.862817", "5.097293"],
+        "exit_code": 0
+      },
+      "fortran_expected": {
+        "stdout_lines": ["220.773975", "31.862817", "5.097293"],
+        "exit_code": 0
+      },
+      "equivalence": "PASS"
+    },
+    {
+      "id": "projectile_05",
+      "c_expected": {"exit_code": 1},
+      "fortran_expected": {"exit_code": 1},
+      "equivalence": "PASS"
+    }
+  ]
+}

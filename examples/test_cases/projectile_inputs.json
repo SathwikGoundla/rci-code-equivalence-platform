@@ -1,0 +1,42 @@
+[
+  {
+    "id": "projectile_01",
+    "name": "Standard 45-degree launch",
+    "description": "45° at 100 m/s — should produce maximum range",
+    "inputs": {"v0": 100.0, "angle": 45.0},
+    "stdin": "100.0 45.0",
+    "expected_behavior": "Range ≈ 1019.37 m, max height ≈ 254.84 m, flight time ≈ 14.43 s"
+  },
+  {
+    "id": "projectile_02",
+    "name": "Low angle trajectory",
+    "description": "30° at 50 m/s",
+    "inputs": {"v0": 50.0, "angle": 30.0},
+    "stdin": "50.0 30.0",
+    "expected_behavior": "Range ≈ 220.77 m, max height ≈ 31.86 m, flight time ≈ 5.10 s"
+  },
+  {
+    "id": "projectile_03",
+    "name": "High angle trajectory",
+    "description": "75° at 80 m/s — asymmetric angles, range same as 15°",
+    "inputs": {"v0": 80.0, "angle": 75.0},
+    "stdin": "80.0 75.0",
+    "expected_behavior": "Range ≈ 319.87 m, max height ≈ 308.44 m, flight time ≈ 15.81 s"
+  },
+  {
+    "id": "projectile_04",
+    "name": "Small velocity",
+    "description": "Edge case: very small initial velocity",
+    "inputs": {"v0": 1.0, "angle": 45.0},
+    "stdin": "1.0 45.0",
+    "expected_behavior": "Range ≈ 0.10194 m, max height ≈ 0.02548 m, flight time ≈ 0.14431 s"
+  },
+  {
+    "id": "projectile_05",
+    "name": "Error: negative velocity",
+    "description": "Negative velocity should trigger error exit",
+    "inputs": {"v0": -10.0, "angle": 45.0},
+    "stdin": "-10.0 45.0",
+    "expected_behavior": "Exit code != 0, error message on stderr"
+  }
+]
